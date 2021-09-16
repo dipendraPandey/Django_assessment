@@ -1,0 +1,92 @@
+{% extends 'employee/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <h5 class="py-1 text-center"> Employee Form</h5>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="form-group col-md-6 mb-0">
+                {{form.full_name|as_crispy_field}}
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                {{form.address|as_crispy_field}}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6 mb-0">
+                {{ form.email|as_crispy_field }}
+            </div>
+            <div class="form-group col-md-6 mb-0">
+                {{ form.phone_number|as_crispy_field }}
+            </div>
+        </div>
+        {{form.image|as_crispy_field}}
+
+        <button type="submit" class="btn btn-primary">Create Employee</button>
+    </form>
+
+    <h5 class="pt-3 pb-1 text-center"> Employee Table</h5>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Created on</th>
+            <th scope="col">Updated on</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for employee in employee_list%}
+        <tr>
+            <th scope="row">{{employee.id}}</th>
+            <td>{{employee.full_name}}</td>
+            <td>{{employee.address}}</td>
+            <td>{{employee.email}}</td>
+            <td>{{employee.phone_number}}</td>
+            <td>{{employee.created|date}}</td>
+            <td>{{employee.updated|date}}</td>
+
+
+            <td><a href="{% url 'employee:employee_delete' id=employee.id %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'employee:employee_edit' id=employee.id %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'employee:employee_detail' id=employee.id %}" class="btn btn-info">Details</a>
+            </td>
+        </tr>
+        {% empty %}
+        <th scope="row">1</th>
+        <td>Dipendra Pandey</td>
+        <td>Kathmandu</td>
+        <td>dipen@dipen.com</td>
+        <td>9844702481</td>
+        <td>Created on</td>
+        <td>Updated on</td>
+        <td><a href="" class="btn btn-danger">Delete</a>
+
+            <button type="button" class="btn btn-warning">Warning</button>
+            <a href="" class="btn btn-info">Details</a>
+        </td>
+
+        {% endfor%}
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+<th scope="row">1</th>
+<td>Dipendra Pandey</td>
+<td>Kathmandu</td>
+<td>dipen@dipen.com</td>
+<td>9844702481</td>
+<td>Created on</td>
+<td>Updated on</td>

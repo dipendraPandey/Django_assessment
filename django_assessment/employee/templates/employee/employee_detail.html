@@ -1,0 +1,34 @@
+{% extends 'employee/base.html' %}
+{% load static %}
+{% block content%}
+<div class="container">
+    <h5 class="py-5 text-center">Employee Details</h5>
+
+    <img src="{{employee_details.image.url}}" class="rounded mx-auto d-block align-center" width="200" height="auto">
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+       <label for="exampleInputEmail1">Full Name</label>
+    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="{{employee_details.full_name}}" disabled >
+      </div>
+      <div class="form-group col-md-6 mb-0">
+        <label for="addresss">Address</label>
+    <input type="email" class="form-control" id="addresss" placeholder="{{employee_details.address}}" disabled  >
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6 mb-0">
+       <label for="email">Email</label>
+    <input type="email" class="form-control" id="email" placeholder="{{employee_details.email}}" disabled >
+      </div>
+      <div class="form-group col-md-6 mb-0">
+        <label for="phone_number">Phone number</label>
+    <input type="email" class="form-control" id="phone_number" placeholder="{{employee_details.phone_number}}"  disabled >
+      </div>
+    </div>
+
+    <a href="{% url 'employee:employee_list' %}"  class=" my-3 align-center btn btn-success" >Go Back</a>
+</div>
+
+
+
+{% endblock content%}
