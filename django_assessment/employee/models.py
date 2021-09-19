@@ -16,6 +16,10 @@ class Employee(models.Model):
     def __str__(self):
         return str(self.full_name)
 
+    def delete(self, using=None, keep_parents=False):
+        self.image.storage.delete(self.image.name)
+        super().delete()
+
     class Meta:
         verbose_name = 'Employee'
         verbose_name_plural = "Employees"
