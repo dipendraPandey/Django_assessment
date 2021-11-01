@@ -108,6 +108,7 @@
         integrity="sha256-xH4q8N0pEzrZMaRmd7gQVcTZiFei+HfRTBPJ1OGXC0k=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout-validation/2.0.4/knockout.validation.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         ko.validation.init(
             {
@@ -125,7 +126,7 @@
         function EmployeeViewModel() {
             var self = this;
             self.employees = ko.observableArray([]);
-            const Url = "http://localhost:8000/api/employee/"
+            const Url = "http://localhost:8004/api/employee/"
             let loadData = () => {
                 axios.get(Url).then(response => {
                     if (response.data.data.length > 0) {
@@ -135,7 +136,7 @@
                         })
                     }
                 })
-                    .catch(error => console.error(error));
+                    .catch(error => console.log(error));
             }
             loadData();
 
@@ -193,7 +194,11 @@
                         }).then(response => {
                             console.log(response);
                             if (response.data.error) {
-                                alert(response.data.message)
+                                swal({
+                                    title: "Error",
+                                    text: response.data.message,
+                                    icon: "error"
+                                })
                             } else {
                                 var oldData = self.employees()[editIndex]
                                 var newData = response.data.data
@@ -205,6 +210,11 @@
                                 document.getElementById("myForm").reset();
                                 editIndex = '';
                                 self.dataURL('');
+                                swal({
+                                    title: "Success",
+                                    text: response.data.message,
+                                    icon: "success"
+                                })
                             }
                         })
                     }
@@ -231,7 +241,11 @@
                             console.log(response);
                             console.log(response.data.error);
                             if (response.data.error) {
-                                alert(response.data.message)
+                                swal({
+                                    title: "Error",
+                                    text: response.data.message,
+                                    icon: "error"
+                                })
                             } else {
                                 document.getElementById("myForm").reset();
                                 newEmployee = response.data.data;
@@ -240,7 +254,11 @@
                                 self.address('');
                                 self.email('');
                                 self.phone_number('');
-                                alert(response.data.message)
+                                swal({
+                                    title: "Success",
+                                    text: response.data.message,
+                                    icon: "success"
+                                })
                             }
 
                         }).catch(error => {
@@ -278,17 +296,45 @@
                         .then(response => {
                             console.log(response);
                             if (response.data.error) {
-                                alert(response.data.message)
+                                throw "error deleting data"
                             } else {
                                 self.employees.remove(item);
-                                alert(response.data.message)
                             }
                         })
                         .catch(error => {
                             console.log(error)
                         })
                 }
-                deleteEmployee(employee.id, employee);
+                swal({
+                    title: "Are you sure?",
+                    text: "Once deleted, you will not be able to recover this Data",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            try {
+                                deleteEmployee(employee.id, employee);
+                                swal("Poof! Your Data is deleted successfully !", {
+                                    icon: "success",
+                                });
+                            } catch {
+                                swal({
+                                    title: "Error",
+                                    text: "Error occured while deleting data",
+                                    icon: "danger"
+                                });
+                            }
+                        } else {
+                            swal({
+                                title: "Action cancel",
+                                text: "Your Data is safe and is not deleted",
+                                icon: "info"
+                            });
+                        }
+                    });
+
 
 
             }
