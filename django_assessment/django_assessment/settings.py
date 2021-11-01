@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     # django-crisp forms
     'crispy_forms',
+      "rest_framework",
 
 
     # apps added

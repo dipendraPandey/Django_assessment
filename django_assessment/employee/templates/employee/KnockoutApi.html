@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
+    <title>Employee</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <form data-bind="submit:addEmployee" id="myForm">
+            <h3 class="my-3 text-primary text-center">Employee Form</h3>
+            <div class="form-row justify-content-center">
+                <div class=" col-md-5 mb-3">
+                    <label for="FullName">Full Name</label>
+                    <input data-bind="value:full_name,css:{'form-control':full_name},class:'form-control'" type=" text"
+                        id="FullName" placeholder="full name">
+                    <div data-bind="validationMessage:full_name" class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="address">Address</label>
+                    <input data-bind="value:address,css:{'form-control':address},class:'form-control'" type="text"
+                        id="address" placeholder="Address">
+                    <div data-bind="validationMessage:address" class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="Email">Email</label>
+                    <input data-bind="value:email,css:{'form-control':email},class:'form-control'" type="text"
+                        id="Email" placeholder="email">
+                    <div data-bind="validationMessage:email" class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <label for="phone_number">Phone Number</label>
+                    <input data-bind="value:phone_number,css:{'form-control':phone_number},class:'form-control'"
+                        type=" text" class="form-control" id="phone_number" placeholder=" phone number">
+                    <div data-bind="validationMessage:phone_number" class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+
+                <div class="col-md-5 mb-3">
+                    <label for="image_file">Image</label>
+                    <input type="file" class="image" id="image_file" data-bind="value: fileData ">
+                    <div data-bind="validationMessage:fileData" class="invalid-feedback">
+                    </div>
+                </div>
+                <div class="col-md-5 mb-3">
+                    <img style="height: 100px; margin: 5px;" class="img-rounded  thumb"
+                        data-bind="attr: { src: dataURL }, visible: dataURL">
+                </div>
+
+
+            </div>
+            <button class="btn btn-primary offset-1" type="submit">Submit form</button>
+        </form>
+        <h5 class="my-2 text-primary text-center">Employee List</h5>
+        <div class="container">
+            <table class=" my-2 table">
+                <thead>
+                    <tr>
+                        <th>SN</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <!-- Todo: Generate table body -->
+                <tbody data-bind="foreach:employees">
+                    <tr>
+                        <td><span data-bind="text:$index"></span></td>
+                        <td><span data-bind="text:full_name"></span></td>
+                        <td><span data-bind="text:address"></span></td>
+                        <td class="text-info"><span data-bind="text:email"></span></td>
+                        <td><span data-bind="text:phone_number"></span></td>
+                        <td><button data-bind="click:$root.editEmployee" class=" btn btn-warning btn-small"
+                                data-bind="">Edit</button>
+                        <td><button class=" btn btn-danger btn-small"
+                                data-bind="click:$root.deleteEmployee">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js"
+        integrity="sha512-2AL/VEauKkZqQU9BHgnv48OhXcJPx9vdzxN1JrKDVc4FPU/MEE/BZ6d9l0mP7VmvLsjtYwqiYQpDskK9dG8KBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"
+        integrity="sha256-xH4q8N0pEzrZMaRmd7gQVcTZiFei+HfRTBPJ1OGXC0k=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout-validation/2.0.4/knockout.validation.min.js"></script>
+    <script>
+        ko.validation.init(
+            {
+                insertMessages: false,
+                decorateInputElement: true,
+                errorElementClass: 'form-control is-invalid',
+
+            }
+        );
+
+        function Employee(name, address, email, phone_number) {
+            return {full_name: name, address: address, email: email, phone_number: phone_number};
+        }
+
+        function EmployeeViewModel() {
+            var self = this;
+            self.employees = ko.observableArray([]);
+            const Url = "http://localhost:8000/api/employee/"
+            let loadData = () => {
+                axios.get(Url).then(response => {
+                    if (response.data.data.length > 0) {
+                        let person_list = response.data.data;
+                        person_list.forEach((person) => {
+                            self.employees.push(person);
+                        })
+                    }
+                })
+                    .catch(error => console.error(error));
+            }
+            loadData();
+
+            var editIndex = ''
+            self.full_name = ko.observable().extend({
+                required: true,
+                minLength: 5,
+                maxLength: 50,
+            });
+            self.dataURL = ko.observable('')
+            self.address = ko.observable().extend({
+                required: true,
+                minLength: 2,
+                maxLength: 30,
+            });
+            self.email = ko.observable().extend({
+                required: true,
+                email: true,
+                maxLength: 30,
+            });
+            self.phone_number = ko.observable().extend({
+                required: true,
+                number: true,
+                minLength: 10,
+                maxLength: 20,
+            });
+            self.fileData = ko.observable().extend({
+                required: true
+            });
+            self.addEmployee = function () {
+                var errors = ko.validation.group(self);
+                if (errors().length > 0) {
+                    errors.showAllMessages();
+                    return;
+                }
+                if (editIndex !== '') {
+                    var data = new Employee(self.full_name(), self.address(), self.email(), self.phone_number());
+                    console.log(self.employees()[editIndex].id)
+                    console.log(editIndex)
+                    let updateEmployee = (data) => {
+                        const imagefile = document.querySelector('#image_file');
+                        form_data = new FormData()
+                        form_data.append('full_name', data.full_name)
+                        form_data.append('address', data.address)
+                        form_data.append('email', data.email)
+                        form_data.append('phone_number', data.phone_number)
+                        form_data.append('csrfmiddlewaretoken', '{{csrf_token}}')
+                        if (imagefile.files[0]) {
+                            form_data.append('image', imagefile.files[0])
+                        }
+                        axios.put(Url + self.employees()[editIndex].id + '/', form_data, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            },
+                        }).then(response => {
+                            console.log(response);
+                            if (response.data.error) {
+                                alert(response.data.message)
+                            } else {
+                                var oldData = self.employees()[editIndex]
+                                var newData = response.data.data
+                                self.employees.replace(oldData, newData)
+                                self.full_name('');
+                                self.address('');
+                                self.email('');
+                                self.phone_number('');
+                                document.getElementById("myForm").reset();
+                                editIndex = '';
+                                self.dataURL('');
+                            }
+                        })
+                    }
+                    updateEmployee(data);
+
+                } else {
+                    var data = new Employee(self.full_name(), self.address(), self.email(), self.phone_number());
+                    console.log(self.fileData())
+                    let postData = (data) => {
+                        const imagefile = document.querySelector('#image_file');
+                        form_data = new FormData()
+                        form_data.append('full_name', data.full_name)
+                        form_data.append('address', data.address)
+                        form_data.append('email', data.email)
+                        form_data.append('phone_number', data.phone_number)
+                        form_data.append('image', imagefile.files[0])
+                        form_data.append('csrfmiddlewaretoken', '{{csrf_token}}')
+                        console.log(form_data)
+                        axios.post(Url, form_data, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }).then(response => {
+                            console.log(response);
+                            console.log(response.data.error);
+                            if (response.data.error) {
+                                alert(response.data.message)
+                            } else {
+                                document.getElementById("myForm").reset();
+                                newEmployee = response.data.data;
+                                self.employees.push(newEmployee);
+                                self.full_name('');
+                                self.address('');
+                                self.email('');
+                                self.phone_number('');
+                                alert(response.data.message)
+                            }
+
+                        }).catch(error => {
+                            console.log(error);
+                        })
+                    }
+                    postData(data);
+
+
+
+
+                }
+            }
+            self.editEmployee = function (employee) {
+                self.full_name(employee.full_name);
+                self.address(employee.address);
+                self.email(employee.email);
+                self.phone_number(employee.phone_number);
+                self.dataURL(employee.image)
+                self.fileData(employee.image)
+                editIndex = self.employees.indexOf(employee);
+                console.log(employee.image)
+                const imagefile = document.querySelector('#image_file');
+                imagefile.src = employee.image;
+
+            }
+            self.deleteEmployee = function (employee) {
+                let deleteEmployee = (id, item) => {
+                    axios.delete(Url + id + '/', {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            "csrfmiddlewaretoken": '{{csrf_token}}',
+                        }
+                    })
+                        .then(response => {
+                            console.log(response);
+                            if (response.data.error) {
+                                alert(response.data.message)
+                            } else {
+                                self.employees.remove(item);
+                                alert(response.data.message)
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }
+                deleteEmployee(employee.id, employee);
+
+
+            }
+
+        }
+        ko.applyBindings(new EmployeeViewModel())
+
+    </script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
